@@ -12,12 +12,10 @@ import me.aidan.sydney.settings.impl.BooleanSetting;
 import me.aidan.sydney.settings.impl.ModeSetting;
 import me.aidan.sydney.settings.impl.NumberSetting;
 import me.aidan.sydney.utils.minecraft.MovementUtils;
-import me.aidan.sydney.utils.system.Timer;
 import net.minecraft.block.Blocks;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.decoration.ArmorStandEntity;
-import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import org.joml.Vector2d;
@@ -35,11 +33,8 @@ public class SpeedModule extends Module {
     public NumberSetting timerMultiplier = new NumberSetting("TimerMultiplier", "Multiplier", "The timer multiplier that will be applied to the timer.", new BooleanSetting.Visibility(useTimer, true), 1.08f, 1.0f, 1.2f);
     public BooleanSetting speedInWater = new BooleanSetting("SpeedInWater", "Increases your speed while in water.", new ModeSetting.Visibility(mode, "Strafe", "StrafeStrict"), false);
 
-    public BooleanSetting autoJump = new BooleanSetting("AutoJump", "Automatically jumps for you when on ground.", new ModeSetting.Visibility(mode, "Grim"), false);
-
     private double distance, speed, forward;
     private int stage, ticks;
-    private boolean pressed = false;
 
     @Override
     public void onEnable() {
@@ -50,7 +45,6 @@ public class SpeedModule extends Module {
     @Override
     public void onDisable() {
         Sydney.WORLD_MANAGER.setTimerMultiplier(1.0f);
-        if(pressed) mc.options.jumpKey.setPressed(false);
     }
 
     @SubscribeEvent
@@ -64,16 +58,6 @@ public class SpeedModule extends Module {
         }
 
         if (mode.getValue().equalsIgnoreCase("Grim")) {
-            if(autoJump.getValue() && MovementUtils.isMoving() && mc.player.isOnGround() && !pressed) {
-                mc.options.jumpKey.setPressed(true);
-                pressed = true;
-            }
-
-            if(!mc.player.isOnGround() && pressed) {
-                mc.options.jumpKey.setPressed(false);
-                pressed = false;
-            }
-
             int collisions = 0;
             for (Entity entity : mc.world.getEntities()) {
                 if (entity != null && entity != mc.player && entity instanceof LivingEntity && !(Sydney.MODULE_MANAGER.getModule(FakePlayerModule.class).isToggled() && Sydney.MODULE_MANAGER.getModule(FakePlayerModule.class).getPlayer() == entity) && !(entity instanceof ArmorStandEntity) && MathHelper.sqrt((float) mc.player.squaredDistanceTo(entity)) <= 1.5) {
@@ -135,4 +119,4 @@ public class SpeedModule extends Module {
     public String getMetaData() {
         return mode.getValue();
     }
-}
+                }
